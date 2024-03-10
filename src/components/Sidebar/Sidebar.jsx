@@ -1,11 +1,18 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import './Sidebar.css'
 import {assets} from '../../assets/assets'
 import { useState } from 'react'
+import { Context } from '../../context/Context'
 
 const Sidebar = () => {
 
     const [extended, setExtended] = useState(false)
+    const { onSent, prevPrompts, setRecentPrompt } = useContext(Context);
+
+    const loadPrompt = async (prompt) => {
+       setRecentPrompt(prompt)
+        await onSent(prompt)
+    }
 
   return (
     <div className='sidebar'>
@@ -19,10 +26,16 @@ const Sidebar = () => {
             ?
             <div className="recent">
                 <p className="recent-title">Recent</p>
-                <div className="recent-entry">
-                    <img src={assets.message_icon} alt="" />
-                    <p>What is react ...</p>
-                </div>
+            {prevPrompts.map((item, index) => {
+                return (
+                    <div onClick={()=>loadPrompt(item)} key={index} className="recent-entry">
+                        <img src={assets.message_icon} alt="" />
+                        <p>{item.slice(0,18)}...</p>
+                    </div>
+                );
+            })}                
+               
+
             </div>
             :null
         }

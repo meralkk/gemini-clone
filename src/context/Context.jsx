@@ -7,7 +7,7 @@ const ContextProvider = (props) => {
 
     const [input, setInput] = useState("");
     const [recentPrompt, setRecentPrompt] = useState("");
-    const [previousPrompt, setPreviousPrompt] = useState([]);
+    const [prevPrompts, setPrevPrompts] = useState([]);
     const [showResult, setShowResult] =  useState(false);
     const [loading, setLoading] = useState(false);
     const [resultData, setResultData] = useState("");
@@ -23,10 +23,18 @@ const ContextProvider = (props) => {
         setResultData("")
         setLoading(true)
         setShowResult(true)
-        setRecentPrompt(input)
-        const response = await runChat(input)
+        let response;
+        if(prompt !== undefined){
+            response = await runChat(prompt);
+            setRecentPrompt(prompt);
+        }
+        else{
+            setPrevPrompts(prev=>[...prev,input])
+            setRecentPrompt(input);
+            response= await runChat(input);  
+        }
         let responseArray = response.split("**");
-        let newResponse;
+        let newResponse="";
         for(let i=0 ; i < responseArray.length; i++)
         {
             if(i === 0 || i%2 !==1) {
@@ -49,8 +57,8 @@ const ContextProvider = (props) => {
     }
 
     const contextValue = {
-        previousPrompt,
-        setPreviousPrompt,
+        prevPrompts,
+        setPrevPrompts,
         onSent,
         setRecentPrompt,
         recentPrompt,
